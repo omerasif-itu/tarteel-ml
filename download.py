@@ -66,7 +66,7 @@ def download_entry_audio(entry, download_audio_dir, raw_audio_dir, use_cache=Tru
 
     # Ensure the proper surah directory structure for the downloaded audio.
     downloaded_ayah_audio_dir = file_utils.prepare_ayah_directory(
-      download_audio_dir, surah_num, ayah_num)
+        download_audio_dir, surah_num, ayah_num)
 
     # Download and save the initially downloaded audio recording to the given path.
     download_recording_from_url(url, downloaded_ayah_audio_dir, use_cache)
@@ -85,13 +85,13 @@ if __name__ == "__main__":
     # Prepare all requisite cache directories.
     subcache_directory_names = (DATASET_CSV_CACHE, DOWNLOADED_AUDIO_CACHE, RAW_AUDIO_CACHE)
     csv_cache_dir, downloaded_audio_dir, raw_audio_dir = file_utils.prepare_cache_directories(
-                                                  subcache_directory_names,
-                                                  cache_directory,
-                                                  use_cache)
+        subcache_directory_names,
+        cache_directory,
+        use_cache)
 
     # Create path to dataset csv.
     path_to_dataset_csv = file_utils.get_path_to_dataset_csv(
-      csv_cache_dir, args.local_csv_filename)
+        csv_cache_dir, args.local_csv_filename)
 
     # If we have decided not to use the cache, download the dataset CSV.
     if not use_cache:
@@ -100,7 +100,7 @@ if __name__ == "__main__":
     # If csv is not in specified location, then throw an error.
     if not file_utils.does_cached_csv_dataset_exist(path_to_dataset_csv):
         logging.info('Dataset CSV not found at {}. Downloading to location...'.format(
-              path_to_dataset_csv))
+            path_to_dataset_csv))
         download_csv_dataset(args.csv_url, path_to_dataset_csv)
     else:
         logging.info("Using cached copy of dataset csv at {}.".format(path_to_dataset_csv))
@@ -116,11 +116,12 @@ if __name__ == "__main__":
     # correctly labeled entries and proceed to download.
     # else do not filter wrt surah number and proceed to download all correctly labeled entries.
     if surah_to_download != -1:
-        le_filtered = list((entry for entry in labeled_entries if entry[0] == str(surah_to_download)))
-    sindices, le_sorted = zip(*sorted(enumerate(le_filtered), key=itemgetter(1)))
+        labeled_entries = list((entry for entry in labeled_entries if entry[0] == str(surah_to_download)))
+    # sorting. Although It is not necessary at the moment but useful for debug outputs.
+    sindices, labeled_entries = zip(*sorted(enumerate(labeled_entries), key=itemgetter(1)))
 
     # Download the audio in the dataset.
-    for entry in tqdm(le_sorted, desc='Audio Files'):
+    for entry in tqdm(labeled_entries, desc='Audio Files'):
         if surah_to_download and entry[0] == str(surah_to_download):
             download_entry_audio(entry, downloaded_audio_dir, raw_audio_dir, use_cache)
         else:
