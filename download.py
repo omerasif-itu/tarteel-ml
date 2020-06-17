@@ -111,20 +111,20 @@ if __name__ == "__main__":
     # Filter out recordings that have been evaluated and labeled falsely.
     labeled_entries = get_correctly_labeled_entries(entries)
 
+    # sorting. Although It is not necessary at the moment but useful for debug outputs.
+    sindices, labeled_entries = zip(*sorted(enumerate(labeled_entries), key=itemgetter(1)))
+
     # Check for surah to download
     # if it is not set default (-1) then filter the surah from
     # correctly labeled entries and proceed to download.
     # else do not filter wrt surah number and proceed to download all correctly labeled entries.
     if surah_to_download != -1:
         labeled_entries = list((entry for entry in labeled_entries if entry[0] == str(surah_to_download)))
-    # sorting. Although It is not necessary at the moment but useful for debug outputs.
-    sindices, labeled_entries = zip(*sorted(enumerate(labeled_entries), key=itemgetter(1)))
-
-    # Download the audio in the dataset.
-    for entry in tqdm(labeled_entries, desc='Audio Files'):
-        if surah_to_download and entry[0] == str(surah_to_download):
+        for entry in tqdm(labeled_entries, desc='Audio Files'):
             download_entry_audio(entry, downloaded_audio_dir, raw_audio_dir, use_cache)
-        else:
+    else:
+        # Download all labeled entries in the dataset.
+        for entry in tqdm(labeled_entries, desc='Audio Files'):
             download_entry_audio(entry, downloaded_audio_dir, raw_audio_dir, use_cache)
 
     # If we don't want to keep the raw audio, remove it from the cache.
